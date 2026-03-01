@@ -110,6 +110,7 @@ public class CrimeListFragment extends Fragment {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
+            mAdapter.setCrimes(crimes);
             mAdapter.notifyDataSetChanged();
         }
         updateSubtitle();
@@ -210,6 +211,10 @@ public class CrimeListFragment extends Fragment {
         private List<Crime> crimes;
 
         public CrimeAdapter(List<Crime> crimes) {
+            this.crimes = crimes;
+        }
+
+        public void setCrimes(List<Crime> crimes) {
             this.crimes = crimes;
         }
 

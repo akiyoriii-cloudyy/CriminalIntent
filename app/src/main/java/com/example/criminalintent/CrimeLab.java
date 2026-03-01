@@ -2,7 +2,6 @@ package com.example.criminalintent;
 
 import android.content.Context;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,15 +11,6 @@ public class CrimeLab {
 
     private CrimeLab() {
         mCrimes = new ArrayList<>();
-
-        for (int i = 1; i <= 20; i++) {
-            Crime crime = new Crime();
-            crime.setTitle("Crime #" + i);
-            crime.setDate(new Date());
-            crime.setSolved(i % 1 == 0);
-            crime.setRequiresPolice(i % 3 == 0);
-            mCrimes.add(crime);
-        }
     }
 
     public static CrimeLab get(Context context) {

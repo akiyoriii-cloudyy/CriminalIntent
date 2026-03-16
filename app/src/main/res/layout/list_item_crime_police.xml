@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    app:cardBackgroundColor="@color/crime_surface_elevated"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/crime_accent_red"
+    app:strokeWidth="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="154dp"
+        android:padding="18dp">
+
+        <View
+            android:id="@+id/case_strip"
+            android:layout_width="6dp"
+            android:layout_height="0dp"
+            android:background="@color/crime_accent_red"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/crime_priority_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:background="@drawable/bg_badge_priority"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+            android:text="@string/crime_priority_badge"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:typeface="monospace"
+            app:layout_constraintStart_toEndOf="@id/case_strip"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/crime_status_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_badge_open"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+            android:textColor="@color/crime_text_primary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:typeface="monospace"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/crime_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/crime_text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:typeface="monospace"
+            app:layout_constraintEnd_toStartOf="@id/crime_status_badge"
+            app:layout_constraintStart_toStartOf="@id/crime_priority_badge"
+            app:layout_constraintTop_toBottomOf="@id/crime_priority_badge" />
+
+        <TextView
+            android:id="@+id/crime_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/crime_text_secondary"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/crime_solved"
+            app:layout_constraintStart_toStartOf="@id/crime_title"
+            app:layout_constraintTop_toBottomOf="@id/crime_title" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/contact_police_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/crime_accent_red"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:text="@string/contact_police"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:cornerRadius="20dp"
+            app:layout_constraintStart_toStartOf="@id/crime_title"
+            app:layout_constraintTop_toBottomOf="@id/crime_date"
+            app:rippleColor="@color/crime_overlay"
+            app:strokeColor="@color/crime_overlay" />
+
+        <ImageView
+            android:id="@+id/crime_solved"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="12dp"
+            android:contentDescription="@string/crime_solved_label"
+            android:src="@drawable/ic_solved"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/crime_status_badge" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

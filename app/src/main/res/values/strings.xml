@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">CriminalIntent</string>
+
+    <string name="crime_title_hint">Enter a title for the crime.</string>
+    <string name="crime_title_label">TITLE</string>
+    <string name="crime_details_label">DETAILS</string>
+    <string name="crime_solved_label">Solved</string>
+    <string name="crime_requires_police_label">Requires Police</string>
+    <string name="crime_save">Save</string>
+    <string name="date_picker_title">Date of crime:</string>
+    <string name="new_crime">New Crime</string>
+    <string name="show_subtitle">Show Subtitle</string>
+    <string name="hide_subtitle">Hide Subtitle</string>
+    <string name="subtitle_format">%1$d crimes</string>
+    <string name="crime_list_header_tag">ACTIVE INVESTIGATION</string>
+    <string name="crime_list_header_title">Case Archive</string>
+    <string name="crime_list_header_copy">Review incidents, flag priority leads, and move fast.</string>
+    <string name="crime_detail_header_tag">CASE DOSSIER</string>
+    <string name="crime_detail_header_title">Case Dossier</string>
+    <string name="crime_detail_header_copy">Capture evidence, suspects, and response level in one place.</string>
+    <string name="crime_action_panel_label">ACTION PANEL</string>
+    <string name="crime_photo_label">EVIDENCE PHOTO</string>
+    <string name="crime_status_open">CASE OPEN</string>
+    <string name="crime_status_solved">CASE CLOSED</string>
+    <string name="crime_priority_badge">PRIORITY</string>
+    <string name="crime_default_title">Untitled Case</string>
+    <string name="crime_jump_first">Jump to First</string>
+    <string name="crime_jump_last">Jump to Last</string>
+
+    <string name="crime_capture_photo">Capture Evidence</string>
+    <string name="crime_photo_hint">Tap the thumbnail after capture to inspect the photo in detail.</string>
+    <string name="crime_photo_dialog_title">Evidence Photo</string>
+    <string name="crime_photo_placeholder_description">No evidence photo has been captured yet.</string>
+    <string name="crime_photo_thumbnail_description">Evidence photo for %1$s</string>
+    <string name="crime_photo_save_failed">The photo was captured but could not be saved.</string>
+    <string name="crime_photo_delete_failed">The evidence photo could not be deleted.</string>
+    <string name="crime_delete_photo">Delete</string>
+    <string name="crime_close_photo">Close</string>
+    <string name="crime_suspect_text">Choose Suspect</string>
+    <string name="crime_report_text">Send Crime Report</string>
+    <string name="crime_no_contacts_available">No contacts were found. Add one in the Contacts app first.</string>
+    <string name="crime_contacts_permission_required">Contacts permission is required to choose a suspect.</string>
+
+    <string name="crime_report">%1$s! The crime was discovered on %2$s, %3$s, and %4$s</string>
+    <string name="crime_report_solved">The case is closed</string>
+    <string name="crime_report_unsolved">The case is open</string>
+    <string name="crime_report_no_suspect">There is no suspect</string>
+    <string name="crime_report_suspect">The suspect is %1$s</string>
+    <string name="crime_report_subject">CriminalIntent Crime Report</string>
+    <string name="send_report">Send crime report via</string>
+    <string name="delete_crime">Delete</string>
+    <string name="contact_police">Contact Police</string>
+    <string name="contact_police_message">Contacting police for %1$s</string>
+</resources>

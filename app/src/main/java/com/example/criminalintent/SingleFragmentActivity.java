@@ -1,6 +1,7 @@
 package com.example.criminalintent;
 
 import android.os.Bundle;
+import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.fragment.app.Fragment;
@@ -10,14 +11,21 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
     public abstract Fragment createFragment();
 
+    @LayoutRes
+    protected int getLayoutResId() {
+        return R.layout.activity_fragment;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
-        setContentView(R.layout.activity_fragment);
+        setContentView(getLayoutResId());
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()

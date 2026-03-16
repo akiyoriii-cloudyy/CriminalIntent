@@ -13,3 +13,12 @@
 .externalNativeBuild
 .cxx
 local.properties
+*.class
+.android-user/
+.gradle-user/
+.gradle-user-build/
+.gradle-user-build2/
+.sandbox-home/
+.gradle-home/
+.vscode/
+.idea/studiobot.xml

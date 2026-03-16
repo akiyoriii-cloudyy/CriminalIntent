@@ -2,9 +2,15 @@
 <resources>
 
     <style name="Theme.CriminalIntent" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/yellow_500</item>
-        <item name="colorPrimaryVariant">@color/yellow_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="android:windowBackground">@color/white</item>
+        <item name="colorPrimary">@color/crime_accent_amber</item>
+        <item name="colorPrimaryVariant">@color/crime_accent_amber_deep</item>
+        <item name="colorSecondary">@color/crime_accent_red</item>
+        <item name="colorOnPrimary">@color/crime_ink_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSurface">@color/crime_surface</item>
+        <item name="colorOnSurface">@color/crime_text_primary</item>
+        <item name="android:windowBackground">@drawable/bg_window_investigation</item>
+        <item name="android:statusBarColor">@color/crime_bg_end</item>
+        <item name="android:navigationBarColor">@color/crime_bg_end</item>
     </style>
 </resources>

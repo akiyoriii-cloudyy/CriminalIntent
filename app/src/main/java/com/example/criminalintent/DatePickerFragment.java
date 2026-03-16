@@ -16,12 +16,16 @@ import java.util.GregorianCalendar;
 public class DatePickerFragment extends DialogFragment {
 
     private static final String ARG_DATE = "date";
-    public static final String EXTRA_DATE = "com.bignerdranch.android.criminalintent.date";
+    private static final String ARG_REQUEST_KEY = "request_key";
+    private static final String ARG_RESULT_KEY = "result_key";
     private DatePicker mDatePicker;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Date date = (Date) getArguments().getSerializable(ARG_DATE);
+        Date date = SerializationCompat.getSerializable(getArguments(), ARG_DATE, Date.class);
+        if (date == null) {
+            date = new Date();
+        }
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -41,26 +45,35 @@ public class DatePickerFragment extends DialogFragment {
                     int pickedMonth = mDatePicker.getMonth();
                     int pickedDay = mDatePicker.getDayOfMonth();
                     Date pickedDate = new GregorianCalendar(pickedYear, pickedMonth, pickedDay).getTime();
-                    sendResult(Activity.RESULT_OK, pickedDate);
+                    sendResult(pickedDate);
                 })
                 .create();
     }
 
-    public static DatePickerFragment newInstance(Date date) {
+    public static DatePickerFragment newInstance(Date date, String requestKey, String resultKey) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_DATE, date);
-        DatePickerFragment fragment = new DatePickerFragment();
+        args.putString(ARG_REQUEST_KEY, requestKey);
+        args.putString(ARG_RESULT_KEY, resultKey);
+         DatePickerFragment fragment = new DatePickerFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    private void sendResult(int resultCode, Date date) {
-        if (getTargetFragment() == null) {
+    private void sendResult(Date date) {
+        Bundle arguments = getArguments();
+        if (arguments == null) {
             return;
         }
 
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_DATE, date);
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+        String requestKey = arguments.getString(ARG_REQUEST_KEY);
+        String resultKey = arguments.getString(ARG_RESULT_KEY);
+        if (requestKey == null || resultKey == null) {
+            return;
+        }
+
+        Bundle result = new Bundle();
+        result.putSerializable(resultKey, date);
+        getParentFragmentManager().setFragmentResult(requestKey, result);
     }
 }

@@ -2,8 +2,6 @@ package com.example.criminalintent.database;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;
-import com.example.criminalintent.Crime;
-import com.example.criminalintent.database.CrimeDbSchema.CrimeTable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -12,18 +10,26 @@ public class CrimeCursorWrapper extends CursorWrapper {
         super(cursor);
     }
 
-    public Crime getCrime() {
-        String uuidString = getString(getColumnIndex(CrimeTable.Cols.UUID));
-        String title = getString(getColumnIndex(CrimeTable.Cols.TITLE));
-        long date = getLong(getColumnIndex(CrimeTable.Cols.DATE));
-        int isSolved = getInt(getColumnIndex(CrimeTable.Cols.SOLVED));
-        String suspect = getString(getColumnIndex(CrimeTable.Cols.SUSPECT));
+    public com.example.criminalintent.Crime getCrime() {
+        String uuidString = getString(getColumnIndexOrThrow(CrimeDbSchema.CrimeTable.Cols.UUID));
+        String title = getString(getColumnIndexOrThrow(CrimeDbSchema.CrimeTable.Cols.TITLE));
+        long date = getLong(getColumnIndexOrThrow(CrimeDbSchema.CrimeTable.Cols.DATE));
+        int isSolved = getInt(getColumnIndexOrThrow(CrimeDbSchema.CrimeTable.Cols.SOLVED));
+        int suspectIndex = getColumnIndex(CrimeDbSchema.CrimeTable.Cols.SUSPECT);
+        int suspectPhoneNumberIndex = getColumnIndex(CrimeDbSchema.CrimeTable.Cols.SUSPECT_PHONE_NUMBER);
+        int requiresPoliceIndex = getColumnIndex(CrimeDbSchema.CrimeTable.Cols.REQUIRES_POLICE);
+        String suspect = suspectIndex >= 0 ? getString(suspectIndex) : null;
+        String suspectPhoneNumber = suspectPhoneNumberIndex >= 0 ? getString(suspectPhoneNumberIndex) : null;
+        boolean requiresPolice = requiresPoliceIndex >= 0 && getInt(requiresPoliceIndex) != 0;
 
-        Crime crime = new Crime(UUID.fromString(uuidString));
+        com.example.criminalintent.Crime crime =
+                new com.example.criminalintent.Crime(UUID.fromString(uuidString));
         crime.setTitle(title);
         crime.setDate(new Date(date));
         crime.setSolved(isSolved != 0);
         crime.setSuspect(suspect);
+        crime.setSuspectPhoneNumber(suspectPhoneNumber);
+        crime.setRequiresPolice(requiresPolice);
 
         return crime;
     }

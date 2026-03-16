@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.criminalintent"
-        minSdk = 35
+        minSdk = 24
         targetSdk = 36
         versionCode = 2
         versionName = "1.0.1"
@@ -41,6 +41,8 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.coordinatorlayout)
+    implementation(libs.androidx.viewpager)
     implementation(libs.google.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

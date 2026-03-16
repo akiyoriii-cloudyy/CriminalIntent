@@ -10,6 +10,7 @@ public class Crime {
     private boolean isSolved;
     private boolean requiresPolice;
     private String mSuspect;
+    private String mSuspectPhoneNumber;
 
     public Crime() {
         this.id = UUID.randomUUID();
@@ -73,5 +74,17 @@ public class Crime {
 
     public void setSuspect(String suspect) {
         mSuspect = suspect;
+    }
+
+    public String getSuspectPhoneNumber() {
+        return mSuspectPhoneNumber;
+    }
+
+    public void setSuspectPhoneNumber(String suspectPhoneNumber) {
+        mSuspectPhoneNumber = suspectPhoneNumber;
+    }
+
+    public String getPhotoFilename() {
+        return "IMG_" + id.toString() + ".jpg";
     }
 }

@@ -9,4 +9,20 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="crime_bg_start">#15181B</color>
+    <color name="crime_bg_end">#08090B</color>
+    <color name="crime_surface">#151C21</color>
+    <color name="crime_surface_elevated">#1D252C</color>
+    <color name="crime_surface_soft">#253039</color>
+    <color name="crime_stroke">#374450</color>
+    <color name="crime_text_primary">#F5EEDD</color>
+    <color name="crime_text_secondary">#B6AE9B</color>
+    <color name="crime_text_muted">#867F72</color>
+    <color name="crime_accent_amber">#F3B24A</color>
+    <color name="crime_accent_amber_deep">#D1792B</color>
+    <color name="crime_accent_red">#D55345</color>
+    <color name="crime_accent_red_deep">#8A2B25</color>
+    <color name="crime_accent_green">#5EAF79</color>
+    <color name="crime_ink_dark">#15110B</color>
+    <color name="crime_overlay">#1FFFFFFF</color>
 </resources>

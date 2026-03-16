@@ -1,7 +1,8 @@
 package com.example.criminalintent;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -13,12 +14,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.card.MaterialCardView;
 import java.util.List;
 
 public class CrimeListFragment extends Fragment {
@@ -27,9 +31,27 @@ public class CrimeListFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
     private boolean mSubtitleVisible;
+    private Callbacks mCallbacks;
 
     private static final int VIEW_TYPE_NORMAL = 0;
     private static final int VIEW_TYPE_POLICE = 1;
+
+    public interface Callbacks {
+        void onCrimeSelected(Crime crime);
+        void onCrimeDeleted(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -58,7 +80,8 @@ public class CrimeListFragment extends Fragment {
                     if (menuItem.getItemId() == R.id.new_crime) {
                         Crime crime = new Crime();
                         CrimeLab.get(requireActivity()).addCrime(crime);
-                        startActivity(CrimePagerActivity.newIntent(requireContext(), crime.getId()));
+                        updateUI();
+                        mCallbacks.onCrimeSelected(crime);
                         return true;
                     } else if (menuItem.getItemId() == R.id.show_subtitle) {
                         mSubtitleVisible = !mSubtitleVisible;
@@ -84,6 +107,7 @@ public class CrimeListFragment extends Fragment {
 
         mCrimeRecyclerView = view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        attachSwipeToDismiss();
 
         updateUI();
 
@@ -102,7 +126,7 @@ public class CrimeListFragment extends Fragment {
         updateUI();
     }
 
-    private void updateUI() {
+    public void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
 
@@ -114,6 +138,38 @@ public class CrimeListFragment extends Fragment {
             mAdapter.notifyDataSetChanged();
         }
         updateSubtitle();
+    }
+
+    private void attachSwipeToDismiss() {
+        ItemTouchHelper.SimpleCallback swipeCallback =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+                    @Override
+                    public boolean onMove(
+                            RecyclerView recyclerView,
+                            RecyclerView.ViewHolder viewHolder,
+                            RecyclerView.ViewHolder target
+                    ) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                        int position = viewHolder.getBindingAdapterPosition();
+                        if (position == RecyclerView.NO_POSITION || mAdapter == null) {
+                            if (mAdapter != null) {
+                                mAdapter.notifyDataSetChanged();
+                            }
+                            return;
+                        }
+
+                        Crime crime = mAdapter.getCrime(position);
+                        CrimeLab.get(requireContext()).deleteCrime(crime);
+                        mCallbacks.onCrimeDeleted(crime);
+                        updateUI();
+                    }
+                };
+
+        new ItemTouchHelper(swipeCallback).attachToRecyclerView(mCrimeRecyclerView);
     }
 
     private void updateSubtitle() {
@@ -129,51 +185,102 @@ public class CrimeListFragment extends Fragment {
         }
     }
 
+    private String getDisplayTitle(Crime crime) {
+        String title = crime.getTitle();
+        return title == null || title.trim().isEmpty()
+                ? getString(R.string.crime_default_title)
+                : title;
+    }
+
+    private CharSequence formatCrimeDate(Crime crime) {
+        return DateFormat.format("EEE, MMM dd  |  hh:mm a", crime.getDate());
+    }
+
+    private void bindStatusBadge(TextView statusTextView, Crime crime) {
+        if (crime.isSolved()) {
+            statusTextView.setText(R.string.crime_status_solved);
+            statusTextView.setBackgroundResource(R.drawable.bg_badge_solved);
+        } else {
+            statusTextView.setText(R.string.crime_status_open);
+            statusTextView.setBackgroundResource(R.drawable.bg_badge_open);
+        }
+    }
+
+    private void bindCaseAppearance(
+            MaterialCardView cardView,
+            View caseStrip,
+            Crime crime,
+            int defaultStrokeColorRes,
+            int defaultStripColorRes
+    ) {
+        int strokeColorRes = crime.isSolved() ? R.color.crime_accent_green : defaultStrokeColorRes;
+        int stripColorRes = crime.isSolved() ? R.color.crime_accent_green : defaultStripColorRes;
+
+        cardView.setStrokeColor(ContextCompat.getColor(cardView.getContext(), strokeColorRes));
+        caseStrip.setBackgroundColor(ContextCompat.getColor(caseStrip.getContext(), stripColorRes));
+    }
+
+    private void bindSolvedIndicator(ImageView solvedImageView, Crime crime) {
+        if (crime.isSolved()) {
+            solvedImageView.setVisibility(View.VISIBLE);
+            solvedImageView.setImageResource(R.drawable.ic_solved);
+        } else {
+            solvedImageView.setVisibility(View.GONE);
+        }
+    }
+
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Crime mCrime;
+        private final MaterialCardView cardView;
+        private final View caseStrip;
         private final TextView titleTextView;
         private final TextView dateTextView;
+        private final TextView statusTextView;
         private final ImageView solvedImageView;
 
         public CrimeHolder(View view) {
             super(view);
+            cardView = (MaterialCardView) itemView;
+            caseStrip = itemView.findViewById(R.id.case_strip);
             titleTextView = itemView.findViewById(R.id.crime_title);
             dateTextView = itemView.findViewById(R.id.crime_date);
+            statusTextView = itemView.findViewById(R.id.crime_status_badge);
             solvedImageView = itemView.findViewById(R.id.crime_solved);
             itemView.setOnClickListener(this);
         }
 
         public void bind(Crime crime) {
             mCrime = crime;
-            titleTextView.setText(crime.getTitle());
-            dateTextView.setText(crime.getDate().toString());
-
-            if (crime.isSolved()) {
-                solvedImageView.setVisibility(View.VISIBLE);
-                solvedImageView.setImageResource(R.drawable.handcuffs);
-            } else {
-                solvedImageView.setVisibility(View.GONE);
-            }
+            titleTextView.setText(getDisplayTitle(crime));
+            dateTextView.setText(formatCrimeDate(crime));
+            bindCaseAppearance(cardView, caseStrip, crime, R.color.crime_stroke, R.color.crime_accent_amber);
+            bindStatusBadge(statusTextView, crime);
+            bindSolvedIndicator(solvedImageView, crime);
         }
 
         @Override
         public void onClick(View v) {
-            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
-            startActivity(intent);
+            mCallbacks.onCrimeSelected(mCrime);
         }
     }
 
     private class CrimePoliceHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Crime mCrime;
+        private final MaterialCardView cardView;
+        private final View caseStrip;
         private final TextView titleTextView;
         private final TextView dateTextView;
+        private final TextView statusTextView;
         private final Button contactPoliceButton;
         private final ImageView solvedImageView;
 
         public CrimePoliceHolder(View view) {
             super(view);
+            cardView = (MaterialCardView) itemView;
+            caseStrip = itemView.findViewById(R.id.case_strip);
             titleTextView = itemView.findViewById(R.id.crime_title);
             dateTextView = itemView.findViewById(R.id.crime_date);
+            statusTextView = itemView.findViewById(R.id.crime_status_badge);
             contactPoliceButton = itemView.findViewById(R.id.contact_police_button);
             solvedImageView = itemView.findViewById(R.id.crime_solved);
             itemView.setOnClickListener(this);
@@ -181,20 +288,17 @@ public class CrimeListFragment extends Fragment {
 
         public void bind(Crime crime) {
             mCrime = crime;
-            titleTextView.setText(crime.getTitle());
-            dateTextView.setText(crime.getDate().toString());
-
-            if (crime.isSolved()) {
-                solvedImageView.setVisibility(View.VISIBLE);
-                solvedImageView.setImageResource(R.drawable.handcuffs);
-            } else {
-                solvedImageView.setVisibility(View.GONE);
-            }
+            String displayTitle = getDisplayTitle(crime);
+            titleTextView.setText(displayTitle);
+            dateTextView.setText(formatCrimeDate(crime));
+            bindCaseAppearance(cardView, caseStrip, crime, R.color.crime_accent_red, R.color.crime_accent_red);
+            bindStatusBadge(statusTextView, crime);
+            bindSolvedIndicator(solvedImageView, crime);
 
             contactPoliceButton.setOnClickListener(v -> 
                 Toast.makeText(
                     getContext(),
-                    "Contacting police for " + crime.getTitle(),
+                    getString(R.string.contact_police_message, displayTitle),
                     Toast.LENGTH_SHORT
                 ).show()
             );
@@ -202,8 +306,7 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
-            startActivity(intent);
+            mCallbacks.onCrimeSelected(mCrime);
         }
     }
 
@@ -216,6 +319,10 @@ public class CrimeListFragment extends Fragment {
 
         public void setCrimes(List<Crime> crimes) {
             this.crimes = crimes;
+        }
+
+        public Crime getCrime(int position) {
+            return crimes.get(position);
         }
 
         @Override

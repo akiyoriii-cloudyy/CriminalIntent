@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.criminalintent.database.CrimeBaseHelper;
 import com.example.criminalintent.database.CrimeCursorWrapper;
 import com.example.criminalintent.database.CrimeDbSchema.CrimeTable;
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,6 +65,11 @@ public class CrimeLab {
     }
 
     public void addCrime(Crime crime) {
+        if (getCrime(crime.getId()) != null) {
+            updateCrime(crime);
+            return;
+        }
+
         ContentValues values = getContentValues(crime);
         mDatabase.insert(CrimeTable.NAME, null, values);
     }
@@ -84,10 +90,19 @@ public class CrimeLab {
                 CrimeTable.Cols.UUID + " = ?",
                 new String[] { uuidString }
         );
+
+        File photoFile = getPhotoFile(crime);
+        if (photoFile.exists()) {
+            photoFile.delete();
+        }
     }
 
     public void saveCrime(Crime crime) {
         updateCrime(crime);
+    }
+
+    public File getPhotoFile(Crime crime) {
+        return new File(mContext.getFilesDir(), crime.getPhotoFilename());
     }
 
     private CrimeCursorWrapper queryCrimes(String whereClause, String[] whereArgs) {
@@ -110,6 +125,8 @@ public class CrimeLab {
         values.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
         values.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
         values.put(CrimeTable.Cols.SUSPECT, crime.getSuspect());
+        values.put(CrimeTable.Cols.SUSPECT_PHONE_NUMBER, crime.getSuspectPhoneNumber());
+        values.put(CrimeTable.Cols.REQUIRES_POLICE, crime.isRequiresPolice() ? 1 : 0);
         return values;
     }
 }

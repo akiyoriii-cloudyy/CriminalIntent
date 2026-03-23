@@ -2,7 +2,6 @@ package com.example.criminalintent;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -13,8 +12,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
+import androidx.core.os.LocaleListCompat;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
@@ -23,6 +25,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
+import java.text.DateFormat;
 import java.util.List;
 
 public class CrimeListFragment extends Fragment {
@@ -67,6 +70,12 @@ public class CrimeListFragment extends Fragment {
 
                 @Override
                 public void onPrepareMenu(Menu menu) {
+                    CrimeLab crimeLab = CrimeLab.get(requireActivity());
+                    MenuItem newCrimeItem = menu.findItem(R.id.new_crime);
+                    if (newCrimeItem != null) {
+                        newCrimeItem.setVisible(crimeLab.canAddMoreCrimes());
+                    }
+
                     MenuItem subtitleItem = menu.findItem(R.id.show_subtitle);
                     if (subtitleItem != null) {
                         subtitleItem.setTitle(mSubtitleVisible
@@ -78,8 +87,14 @@ public class CrimeListFragment extends Fragment {
                 @Override
                 public boolean onMenuItemSelected(MenuItem menuItem) {
                     if (menuItem.getItemId() == R.id.new_crime) {
+                        CrimeLab crimeLab = CrimeLab.get(requireActivity());
+                        if (!crimeLab.canAddMoreCrimes()) {
+                            requireActivity().invalidateOptionsMenu();
+                            return true;
+                        }
+
                         Crime crime = new Crime();
-                        CrimeLab.get(requireActivity()).addCrime(crime);
+                        crimeLab.addCrime(crime);
                         updateUI();
                         mCallbacks.onCrimeSelected(crime);
                         return true;
@@ -88,6 +103,9 @@ public class CrimeListFragment extends Fragment {
                         updateSubtitle();
                         requireActivity().invalidateOptionsMenu();
                         return true;
+                    } else if (menuItem.getItemId() == R.id.change_language) {
+                        showLanguageSelectionDialog();
+                        return true;
                     }
                     return false;
                 }
@@ -95,6 +113,19 @@ public class CrimeListFragment extends Fragment {
             getViewLifecycleOwner(),
             Lifecycle.State.RESUMED
         );
+    }
+
+    private void showLanguageSelectionDialog() {
+        String[] languages = {"English", "Español"};
+        String[] langTags = {"en", "es"};
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Select Language")
+                .setItems(languages, (dialog, which) -> {
+                    LocaleListCompat appLocales = LocaleListCompat.forLanguageTags(langTags[which]);
+                    AppCompatDelegate.setApplicationLocales(appLocales);
+                })
+                .show();
     }
 
     @Override
@@ -138,6 +169,7 @@ public class CrimeListFragment extends Fragment {
             mAdapter.notifyDataSetChanged();
         }
         updateSubtitle();
+        requireActivity().invalidateOptionsMenu();
     }
 
     private void attachSwipeToDismiss() {
@@ -173,7 +205,7 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void updateSubtitle() {
-        int crimeCount = CrimeLab.get(getActivity()).getCrimes().size();
+        int crimeCount = CrimeLab.get(getActivity()).getCrimeCount();
         String subtitle = getString(R.string.subtitle_format, crimeCount);
         if (!mSubtitleVisible) {
             subtitle = null;
@@ -193,7 +225,8 @@ public class CrimeListFragment extends Fragment {
     }
 
     private CharSequence formatCrimeDate(Crime crime) {
-        return DateFormat.format("EEE, MMM dd  |  hh:mm a", crime.getDate());
+        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+        return dateFormat.format(crime.getDate());
     }
 
     private void bindStatusBadge(TextView statusTextView, Crime crime) {

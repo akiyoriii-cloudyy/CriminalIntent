@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class CrimeLab {
+    public static final int MAX_CRIMES = 10;
+
     private static CrimeLab sCrimeLab;
     private final Context mContext;
     private final SQLiteDatabase mDatabase;
@@ -45,6 +47,14 @@ public class CrimeLab {
         }
 
         return crimes;
+    }
+
+    public int getCrimeCount() {
+        return getCrimes().size();
+    }
+
+    public boolean canAddMoreCrimes() {
+        return getCrimeCount() < MAX_CRIMES;
     }
 
     public Crime getCrime(UUID id) {

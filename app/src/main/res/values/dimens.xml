@@ -1,4 +1,6 @@
 <resources>
     <dimen name="crime_photo_height">220dp</dimen>
     <dimen name="crime_photo_placeholder_padding">20dp</dimen>
+    <dimen name="contact_picker_dialog_max_width">440dp</dimen>
+    <dimen name="contact_picker_dialog_max_height">720dp</dimen>
 </resources>

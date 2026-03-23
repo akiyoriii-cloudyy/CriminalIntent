@@ -1,15 +1,13 @@
 package com.example.criminalintent;
 
 import android.Manifest;
-import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -32,6 +30,7 @@ import androidx.core.content.FileProvider;
 import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import java.io.File;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -40,9 +39,13 @@ public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_PHOTO = "DialogPhoto";
+    private static final String DIALOG_CONTACT_PICKER = "DialogContactPicker";
     private static final String REQUEST_KEY_DATE_PREFIX = "request_key_date_";
     private static final String RESULT_KEY_DATE_PREFIX = "result_key_date_";
     private static final String REQUEST_KEY_PHOTO_DELETE_PREFIX = "request_key_photo_delete_";
+    private static final String REQUEST_KEY_CONTACT_PICK_PREFIX = "request_key_contact_pick_";
+    private static final String RESULT_KEY_CONTACT_PICK_PREFIX = "result_key_contact_pick_";
+    private static final String RESULT_KEY_CONTACT_PHONE_PREFIX = "result_key_contact_phone_";
 
     public interface Callbacks {
         void onCrimeUpdated(Crime crime);
@@ -53,6 +56,9 @@ public class CrimeFragment extends Fragment {
     private String mDateRequestKey;
     private String mDateResultKey;
     private String mPhotoDeleteRequestKey;
+    private String mContactPickerRequestKey;
+    private String mContactPickerResultKey;
+    private String mContactPickerPhoneResultKey;
     private EditText titleField;
     private Button mDateButton;
     private CheckBox solvedCheckBox;
@@ -60,6 +66,7 @@ public class CrimeFragment extends Fragment {
     private Button saveButton;
     private Button mPhotoButton;
     private Button mSuspectButton;
+    private Button mCallSuspectButton;
     private Button mReportButton;
     private ImageView mPhotoView;
     private File mPhotoFile;
@@ -68,7 +75,6 @@ public class CrimeFragment extends Fragment {
     private Callbacks mCallbacks;
     private ActivityResultLauncher<String> requestContactsPermissionLauncher;
     private ActivityResultLauncher<Uri> takePhotoLauncher;
-    private ActivityResultLauncher<Intent> pickContactLauncher;
 
     @Override
     public void onAttach(Context context) {
@@ -93,6 +99,9 @@ public class CrimeFragment extends Fragment {
         mDateRequestKey = REQUEST_KEY_DATE_PREFIX + mCrime.getId();
         mDateResultKey = RESULT_KEY_DATE_PREFIX + mCrime.getId();
         mPhotoDeleteRequestKey = REQUEST_KEY_PHOTO_DELETE_PREFIX + mCrime.getId();
+        mContactPickerRequestKey = REQUEST_KEY_CONTACT_PICK_PREFIX + mCrime.getId();
+        mContactPickerResultKey = RESULT_KEY_CONTACT_PICK_PREFIX + mCrime.getId();
+        mContactPickerPhoneResultKey = RESULT_KEY_CONTACT_PHONE_PREFIX + mCrime.getId();
 
         getParentFragmentManager().setFragmentResultListener(
                 mDateRequestKey,
@@ -112,6 +121,31 @@ public class CrimeFragment extends Fragment {
                 (requestKey, result) -> {
                     if (result.getBoolean(CrimePhotoDialogFragment.RESULT_DELETE_PHOTO, false)) {
                         deletePhoto();
+                    }
+                }
+        );
+        getParentFragmentManager().setFragmentResultListener(
+                mContactPickerRequestKey,
+                this,
+                (requestKey, result) -> {
+                    String suspect = result.getString(mContactPickerResultKey);
+                    if (suspect == null || suspect.trim().isEmpty()) {
+                        return;
+                    }
+
+                    String suspectPhoneNumber = result.getString(mContactPickerPhoneResultKey);
+                    mCrime.setSuspect(suspect);
+                    mCrime.setSuspectPhoneNumber(suspectPhoneNumber);
+                    updateCrime();
+                    updateSuspectButton();
+                    updateCallSuspectButton();
+
+                    if (suspectPhoneNumber == null || suspectPhoneNumber.trim().isEmpty()) {
+                        Toast.makeText(
+                                requireContext(),
+                                R.string.crime_suspect_phone_missing,
+                                Toast.LENGTH_SHORT
+                        ).show();
                     }
                 }
         );
@@ -141,17 +175,6 @@ public class CrimeFragment extends Fragment {
                         discardPendingPhoto();
                     }
                     updatePhotoView();
-                }
-        );
-
-        pickContactLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null) {
-                        return;
-                    }
-
-                    handleContactPicked(result.getData());
                 }
         );
     }
@@ -185,6 +208,7 @@ public class CrimeFragment extends Fragment {
         saveButton = view.findViewById(R.id.crime_save);
         mPhotoButton = view.findViewById(R.id.crime_camera);
         mSuspectButton = view.findViewById(R.id.crime_suspect);
+        mCallSuspectButton = view.findViewById(R.id.crime_call_suspect);
         mReportButton = view.findViewById(R.id.crime_report);
         mPhotoView = view.findViewById(R.id.crime_photo);
 
@@ -247,21 +271,14 @@ public class CrimeFragment extends Fragment {
             }
         });
 
-        final Intent pickContact = new Intent(
-                Intent.ACTION_PICK,
-                ContactsContract.Contacts.CONTENT_URI
-        );
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         PackageManager pm = requireActivity().getPackageManager();
-        if (pm.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
-            mSuspectButton.setEnabled(false);
-        } else {
-            mSuspectButton.setEnabled(true);
-        }
+        mSuspectButton.setEnabled(true);
         mPhotoButton.setEnabled(pm.resolveActivity(captureImage, PackageManager.MATCH_DEFAULT_ONLY) != null);
 
         updateSuspectButton();
+        updateCallSuspectButton();
         observePhotoViewLayout();
 
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
@@ -271,6 +288,7 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        mCallSuspectButton.setOnClickListener(v -> dialSuspect());
         mPhotoButton.setOnClickListener(v -> launchCamera());
         mPhotoView.setOnClickListener(v -> showPhotoDialog());
 
@@ -286,9 +304,8 @@ public class CrimeFragment extends Fragment {
                 ? getString(R.string.crime_report_solved)
                 : getString(R.string.crime_report_unsolved);
 
-        String dateString = android.text.format.DateFormat
-                .format("EEE, MMM dd", mCrime.getDate())
-                .toString();
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+        String dateString = dateFormat.format(mCrime.getDate());
 
         String suspect = mCrime.getSuspect() == null
                 ? getString(R.string.crime_report_no_suspect)
@@ -320,46 +337,9 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updateDate() {
-        CharSequence dateText = android.text.format.DateFormat.format(
-                "EEE, MMM dd yyyy  |  hh:mm a",
-                mCrime.getDate()
-        );
+        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+        String dateText = dateFormat.format(mCrime.getDate());
         mDateButton.setText(dateText);
-    }
-
-    private void handleContactPicked(Intent data) {
-        Uri contactUri = data.getData();
-        if (contactUri == null) {
-            return;
-        }
-
-        String[] queryFields = new String[] {
-                ContactsContract.Contacts.DISPLAY_NAME
-        };
-
-        Cursor cursor = requireActivity()
-                .getContentResolver()
-                .query(contactUri, queryFields, null, null, null);
-
-        try {
-            if (cursor == null || cursor.getCount() == 0) {
-                return;
-            }
-
-            cursor.moveToFirst();
-            String suspect = cursor.getString(
-                    cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME)
-            );
-            mCrime.setSuspect(suspect);
-            mCrime.setSuspectPhoneNumber(null);
-            updateCrime();
-            updateSuspectButton();
-
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
     }
 
     private void launchCamera() {
@@ -390,16 +370,17 @@ public class CrimeFragment extends Fragment {
     }
 
     private void launchContactPicker() {
-        if (!hasAvailableContacts()) {
-            Toast.makeText(requireContext(), R.string.crime_no_contacts_available, Toast.LENGTH_SHORT).show();
+        if (getParentFragmentManager().findFragmentByTag(DIALOG_CONTACT_PICKER) != null) {
             return;
         }
 
-        Intent pickContact = new Intent(
-                Intent.ACTION_PICK,
-                ContactsContract.Contacts.CONTENT_URI
-        );
-        pickContactLauncher.launch(pickContact);
+        ContactPickerDialogFragment
+                .newInstance(
+                        mContactPickerRequestKey,
+                        mContactPickerResultKey,
+                        mContactPickerPhoneResultKey
+                )
+                .show(getParentFragmentManager(), DIALOG_CONTACT_PICKER);
     }
 
     private void observePhotoViewLayout() {
@@ -549,31 +530,49 @@ public class CrimeFragment extends Fragment {
         }
     }
 
-    private boolean hasAvailableContacts() {
-        Cursor contactCursor = requireActivity()
-                .getContentResolver()
-                .query(
-                        ContactsContract.Contacts.CONTENT_URI,
-                        new String[] { ContactsContract.Contacts._ID },
-                        null,
-                        null,
-                        null
-                );
-
-        try {
-            return contactCursor != null && contactCursor.moveToFirst();
-        } finally {
-            if (contactCursor != null) {
-                contactCursor.close();
-            }
-        }
-    }
-
     private void updateSuspectButton() {
         if (mCrime.getSuspect() == null || mCrime.getSuspect().trim().isEmpty()) {
             mSuspectButton.setText(R.string.crime_suspect_text);
         } else {
             mSuspectButton.setText(mCrime.getSuspect());
+        }
+    }
+
+    private void updateCallSuspectButton() {
+        if (mCallSuspectButton == null) {
+            return;
+        }
+
+        boolean hasPhoneNumber = hasSuspectPhoneNumber();
+        mCallSuspectButton.setEnabled(hasPhoneNumber);
+        mCallSuspectButton.setAlpha(hasPhoneNumber ? 1f : 0.55f);
+
+        String suspect = mCrime.getSuspect();
+        if (hasPhoneNumber && suspect != null && !suspect.trim().isEmpty()) {
+            mCallSuspectButton.setText(getString(R.string.crime_call_suspect_with_name, suspect));
+        } else {
+            mCallSuspectButton.setText(R.string.crime_call_suspect_text);
+        }
+    }
+
+    private boolean hasSuspectPhoneNumber() {
+        String suspectPhoneNumber = mCrime.getSuspectPhoneNumber();
+        return suspectPhoneNumber != null && !suspectPhoneNumber.trim().isEmpty();
+    }
+
+    private void dialSuspect() {
+        if (!hasSuspectPhoneNumber()) {
+            Toast.makeText(requireContext(), R.string.crime_call_suspect_unavailable, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent dialIntent = new Intent(Intent.ACTION_DIAL);
+        dialIntent.setData(Uri.parse("tel:" + Uri.encode(mCrime.getSuspectPhoneNumber())));
+
+        try {
+            startActivity(dialIntent);
+        } catch (ActivityNotFoundException exception) {
+            Toast.makeText(requireContext(), R.string.crime_dialer_unavailable, Toast.LENGTH_SHORT).show();
         }
     }
 

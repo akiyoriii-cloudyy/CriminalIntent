@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        app:cardBackgroundColor="@color/contact_picker_bg"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/contact_picker_border"
+        app:strokeWidth="1dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="18dp"
+            android:paddingTop="18dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="18dp">
+
+            <ImageButton
+                android:id="@+id/contact_picker_close"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/crime_contact_picker_close"
+                android:padding="8dp"
+                android:src="@drawable/ic_contact_close"
+                android:tint="@color/contact_picker_primary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/contact_picker_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/crime_contact_picker_title"
+                android:textColor="@color/contact_picker_primary"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="@id/contact_picker_close"
+                app:layout_constraintEnd_toStartOf="@id/contact_picker_search"
+                app:layout_constraintStart_toEndOf="@id/contact_picker_close"
+                app:layout_constraintTop_toTopOf="@id/contact_picker_close" />
+
+            <ImageButton
+                android:id="@+id/contact_picker_search"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/crime_contact_picker_search"
+                android:padding="8dp"
+                android:src="@drawable/ic_contact_search"
+                android:tint="@color/contact_picker_primary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/contact_picker_search_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_contact_picker_search"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="10dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contact_picker_close">
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@null"
+                    android:clickable="false"
+                    android:contentDescription="@null"
+                    android:focusable="false"
+                    android:src="@drawable/ic_contact_search"
+                    android:tint="@color/contact_picker_secondary" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/contact_picker_search_field"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/crime_contact_picker_search_hint"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/contact_picker_primary"
+                    android:textColorHint="@color/contact_picker_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/contact_picker_summary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:drawablePadding="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/contact_picker_secondary"
+                android:textSize="13sp"
+                android:drawableStart="@drawable/ic_contact_group"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contact_picker_search_container"
+                tools:text="All contacts · 5 contacts" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/contact_picker_create_contact"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="52dp"
+                android:text="@string/crime_contact_picker_create_contact"
+                android:textAllCaps="false"
+                android:textColor="@color/contact_picker_primary"
+                android:textSize="15sp"
+                app:backgroundTint="@color/contact_picker_chip"
+                app:cornerRadius="22dp"
+                app:icon="@drawable/ic_contact_add"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp"
+                app:iconTint="@color/contact_picker_primary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contact_picker_summary"
+                app:rippleColor="@color/contact_picker_border"
+                app:strokeWidth="0dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/contact_picker_recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="14dp"
+                android:clipToPadding="false"
+                android:paddingBottom="4dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contact_picker_create_contact" />
+
+            <TextView
+                android:id="@+id/contact_picker_empty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/contact_picker_secondary"
+                android:textSize="15sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contact_picker_create_contact" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IntentoCriminal</string>
+    <string name="crime_title_hint">Introduzca un título para el crimen.</string>
+    <string name="crime_title_label">TÍTULO</string>
+    <string name="crime_details_label">DETALLES</string>
+    <string name="crime_solved_label">Solucionado</string>
+    <string name="crime_requires_police_label">Requiere Policía</string>
+    <string name="crime_save">Guardar</string>
+    <string name="date_picker_title">Fecha del crimen:</string>
+    <string name="new_crime">Crimen Nuevo</string>
+    <string name="show_subtitle">Mostrar Subtítulo</string>
+    <string name="hide_subtitle">Ocultar Subtítulo</string>
+    <string name="subtitle_format">%1$d crímenes</string>
+    <string name="crime_suspect_text">Elegir Sospechoso</string>
+    <string name="crime_report_text">Enviar Informe de Crimen</string>
+    <string name="crime_report">%1$s! El crimen fue descubierto el %2$s, %3$s, y %4$s</string>
+    <string name="crime_report_solved">El caso está cerrado</string>
+    <string name="crime_report_unsolved">El caso está abierto</string>
+    <string name="crime_report_no_suspect">No hay sospechoso</string>
+    <string name="crime_report_suspect">El sospechoso es %1$s</string>
+    <string name="crime_report_subject">Informe de Crimen de IntentoCriminal</string>
+    <string name="send_report">Enviar informe de crimen a través de</string>
+    <string name="delete_crime">Eliminar</string>
+    <string name="contact_police">Contactar a la Policía</string>
+    <string name="contact_police_message">Contactando a la policía por %1$s</string>
+</resources>

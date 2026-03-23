@@ -265,6 +265,25 @@
                     app:strokeWidth="1dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/crime_call_suspect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="@color/crime_surface_soft"
+                    android:enabled="false"
+                    android:minHeight="56dp"
+                    android:text="@string/crime_call_suspect_text"
+                    android:textColor="@color/crime_text_primary"
+                    app:cornerRadius="20dp"
+                    app:icon="@android:drawable/ic_menu_call"
+                    app:iconGravity="textStart"
+                    app:iconPadding="10dp"
+                    app:iconTint="@color/crime_accent_green"
+                    app:rippleColor="@color/crime_overlay"
+                    app:strokeColor="@color/crime_accent_green"
+                    app:strokeWidth="1dp" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/crime_report"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

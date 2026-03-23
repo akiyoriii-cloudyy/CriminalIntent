@@ -37,7 +37,23 @@
     <string name="crime_delete_photo">Delete</string>
     <string name="crime_close_photo">Close</string>
     <string name="crime_suspect_text">Choose Suspect</string>
+    <string name="crime_call_suspect_text">Call Suspect</string>
+    <string name="crime_call_suspect_with_name">Call %1$s</string>
+    <string name="crime_contact_picker_title">Choose a contact</string>
+    <string name="crime_contact_picker_summary">All contacts · %1$d contacts</string>
+    <string name="crime_contact_picker_results">Search results · %1$d contacts</string>
+    <string name="crime_contact_picker_search_hint">Search contacts</string>
+    <string name="crime_contact_picker_empty">No contacts were found. Create one to use as a suspect.</string>
+    <string name="crime_contact_picker_empty_search">No contacts match your search.</string>
+    <string name="crime_contact_picker_create_contact">Create contact</string>
+    <string name="crime_contact_picker_close">Close</string>
+    <string name="crime_contact_picker_search">Search contacts</string>
+    <string name="crime_add_contact">Add Contact</string>
+    <string name="crime_add_contact_unavailable">The Contacts app is not available for adding a new contact.</string>
     <string name="crime_report_text">Send Crime Report</string>
+    <string name="crime_call_suspect_unavailable">This suspect has no phone number to dial.</string>
+    <string name="crime_suspect_phone_missing">This contact does not have a phone number saved.</string>
+    <string name="crime_dialer_unavailable">No dialer app is available on this device.</string>
     <string name="crime_no_contacts_available">No contacts were found. Add one in the Contacts app first.</string>
     <string name="crime_contacts_permission_required">Contacts permission is required to choose a suspect.</string>
 

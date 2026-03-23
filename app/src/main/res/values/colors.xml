@@ -25,4 +25,11 @@
     <color name="crime_accent_green">#5EAF79</color>
     <color name="crime_ink_dark">#15110B</color>
     <color name="crime_overlay">#1FFFFFFF</color>
+    <color name="contact_picker_bg">#EEF0FB</color>
+    <color name="contact_picker_surface">#FBFBFF</color>
+    <color name="contact_picker_border">#DADFF1</color>
+    <color name="contact_picker_primary">#1F2432</color>
+    <color name="contact_picker_secondary">#616879</color>
+    <color name="contact_picker_chip">#DCE2FB</color>
+    <color name="contact_picker_avatar_bg">#FFB6AE</color>
 </resources>

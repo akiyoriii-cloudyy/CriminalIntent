@@ -24,4 +24,5 @@
     <string name="delete_crime">Eliminar</string>
     <string name="contact_police">Contactar a la Policía</string>
     <string name="contact_police_message">Contactando a la policía por %1$s</string>
+    <string name="welcome_select_crime">Bienvenido de nuevo, Detective.\nPor favor, seleccione un caso del archivo para comenzar su investigación.</string>
 </resources>

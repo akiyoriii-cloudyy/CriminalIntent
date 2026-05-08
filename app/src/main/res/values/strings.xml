@@ -67,4 +67,6 @@
     <string name="delete_crime">Delete</string>
     <string name="contact_police">Contact Police</string>
     <string name="contact_police_message">Contacting police for %1$s</string>
+
+    <string name="welcome_select_crime">Welcome back, Detective.\nPlease select a case from the archive to begin your investigation.</string>
 </resources>
